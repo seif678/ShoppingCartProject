@@ -1,7 +1,8 @@
 from django.shortcuts import render
-
+from Site.models import *
 def Store(request):
-    context = {}
+    products = Product.objects.all()
+    context = {'products': products}
     return render(request,'Site/Store.html', context)
 def Cart(request):
     context = {}
