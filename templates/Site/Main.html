@@ -1,4 +1,5 @@
 {% load static %}
+{{ minMaxPrice }}
 <html>
 <head>
 	<title>Ecom</title>
@@ -70,10 +71,23 @@
 
 	  </div>
         <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <input class="form-control mr-sm-2" name = "q" type="search" placeholder="Search" aria-label="Search">
       <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
     </form>
 	</nav>
+    <form class="form-inline my-2 my-lg-0">
+ <div class="list-group list-group-flush">
+					<li class="list-group-item">
+						<input type="range" value="{{minMaxPrice.price__min}}" max={{minMaxPrice.price__max}} min={{minMaxPrice.price__min}} id="rangeInput" oninput="maxPrice.value=this.value" />
+						<p>{{minMaxPrice.price__min}}-{{minMaxPrice.price__max}}</p>
+					</li>
+					<li class="list-group-item">
+						Max: <input type="search" name="k" value="{{minMaxPrice.price__min}}" max={{minMaxPrice.price__max}} min={{minMaxPrice.price__min}} class="form-control" id="maxPrice" onkeyup="rangeInput.value=this.value" id="maxPrice" />
+						<button id="priceFilterBtn" class="btn btn-info btn-sm mt-1">Filter</button>
+					</li>
+				</div>
+    </form>
+    <hr>
 
      <div class="container">
             <br>

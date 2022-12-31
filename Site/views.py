@@ -1,3 +1,4 @@
+from django.db.models import Min, Max
 from django.shortcuts import render
 from django.http import JsonResponse
 import json
@@ -16,10 +17,20 @@ def Store(request):
         items = []
         order = {'get_cart_total': 0, 'get_cart_items': 0, 'shipping': False}
         cartItems = order['get_cart_items']
-
-    products = Product.objects.all()
-    context = {'products': products, 'cartItems': cartItems}
+    minMaxPrice = Product.objects.aggregate(Min('price'), Max('price'))
+    minPrice = minMaxPrice['price__min']
+    maxPrice = minMaxPrice['price__max']
+    if 'q' in request.GET:
+        q = request.GET['q']
+        products = Product.objects.filter(name__icontains=q) | Product.objects.filter(brand__icontains=q)
+    elif 'k' in request.GET:
+        k = request.GET['k']
+        products = Product.objects.filter(price__range=(minPrice, k))
+    else:
+        products = Product.objects.all()
+    context = {'products': products, 'cartItems': cartItems, 'minMaxPrice': minMaxPrice}
     return render(request, 'Site/Store.html', context)
+
 
 
 def Cart(request):
@@ -104,3 +115,9 @@ def processOrder(request):
         print('User is not logged in')
 
     return JsonResponse('Payment submitted..', safe=False)
+
+def login(request):
+    return render(request, 'Site/login.html')
+
+def register(request):
+    return render(request, 'Site/register.html')
