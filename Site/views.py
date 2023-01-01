@@ -1,40 +1,60 @@
+from django.contrib.auth import authenticate, login, logout
 from django.db.models import Min, Max
-from django.shortcuts import render
+from django.db.models.signals import post_save
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
+from .forms import CustomerUserCreationForm
 import json
 import datetime
 from .models import *
 
+def create_profile(sender, instance, created, *args, **kwargs):
+    # ignore if this is an existing User
+    if not created:
+        return
 
+    try:
+        Customer.objects.get(user=instance)
+    except Customer.DoesNotExist:
+        Customer.objects.create(user=instance)
 def Store(request):
     if request.user.is_authenticated:
+        create_profile(sender=User, instance=request.user, created=True)
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
         items = order.orderitem_set.all()
         cartItems = order.get_cart_items
     else:
-        # Create empty cart for now for non-logged in user
-        items = []
-        order = {'get_cart_total': 0, 'get_cart_items': 0, 'shipping': False}
-        cartItems = order['get_cart_items']
+        cartItems = []
+    categories = Product.objects.values('brand').distinct()
     minMaxPrice = Product.objects.aggregate(Min('price'), Max('price'))
     minPrice = minMaxPrice['price__min']
     maxPrice = minMaxPrice['price__max']
     if 'q' in request.GET:
         q = request.GET['q']
         products = Product.objects.filter(name__icontains=q) | Product.objects.filter(brand__icontains=q)
-    elif 'k' in request.GET:
+        context = {'products': products, 'cartItems': cartItems, 'minMaxPrice': minMaxPrice}
+        return render(request, 'Site/Store.html', context)
+    if 'k' in request.GET:
         k = request.GET['k']
-        products = Product.objects.filter(price__range=(minPrice, k))
     else:
-        products = Product.objects.all()
-    context = {'products': products, 'cartItems': cartItems, 'minMaxPrice': minMaxPrice}
-    return render(request, 'Site/Store.html', context)
+        k = maxPrice
+    if 'b' in request.GET and request.GET['b'] != 'Choose...':
+        b = request.GET['b']
+        products = Product.objects.filter(brand__icontains=b) & Product.objects.filter(price__range=(minPrice, k))
+    else:
+        products = Product.objects.filter(price__range=(minPrice, k))
+
+    context = {'products': products, 'cartItems': cartItems, 'minMaxPrice': minMaxPrice, 'categories': categories}
+    return render(request, 'Site/Store.html',context)
+
+
 
 
 
 def Cart(request):
     if request.user.is_authenticated:
+        create_profile(sender=User, instance=request.user, created=True)
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
         items = order.orderitem_set.all()
@@ -50,6 +70,7 @@ def Cart(request):
 
 def Checkout(request):
     if request.user.is_authenticated:
+        create_profile(sender=User, instance=request.user, created=True)
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
         items = order.orderitem_set.all()
@@ -87,7 +108,6 @@ def updateItem(request):
 
     return JsonResponse('Item was added', safe=False)
 
-
 def processOrder(request):
     transaction_id = datetime.datetime.now().timestamp()
     data = json.loads(request.body)
@@ -116,8 +136,36 @@ def processOrder(request):
 
     return JsonResponse('Payment submitted..', safe=False)
 
-def login(request):
-    return render(request, 'Site/login.html')
 
-def register(request):
-    return render(request, 'Site/register.html')
+def loginPage(request):
+    page = 'login'
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('Store')
+
+    return render(request, 'Site/login_register.html',{'page': page})
+
+def logoutPage(request):
+    logout(request)
+    return redirect('login')
+
+def registerPage(request):
+    page = 'register'
+    form = CustomerUserCreationForm()
+    if request.method == 'POST':
+        form = CustomerUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.save()
+            user = authenticate(request, username=user.username, password=request.POST['password1'])
+            if user is not None:
+                login(request, user)
+                return redirect('Store')
+    context = {'form': form, 'page': page}
+    return render(request,'Site/login_register.html',context)

@@ -143,18 +143,18 @@ button{
         {% csrf_token %}
         <h3>Signup Here</h3>
 
-        <label for="username">Username</label>
-        <input type="text" placeholder="Username" name="username" id="username">
+        <label for="user">Username</label>
+        <input type="text" placeholder="Username" name="user" id="user">
 
-        <label for="email">Email</label>
-        <input type="email" placeholder="Email or Phone" name="email" id="email">
+        <label for="name">name</label>
+        <input type="text" placeholder="name" name="name" id="name">
 
-        <label for="password1">Password</label>
-        <input type="password" placeholder="Password" id="password1" name="password1">
+        <label for="email">email</label>
+        <input type="email" placeholder="email" id="email" name="email">
 
 
-        <label for="password2">Confrom Password</label>
-        <input type="password" placeholder="Confrom Password" id="password2" name="password2">
+        <label for="password"> Password</label>
+        <input type="password" placeholder="Password" id="password" name="password">
         <button type="submit">Signup</button>
 
         <a href="{% url 'login' %}" >I have already account</a>
@@ -163,11 +163,11 @@ button{
     </form>
     <script type="text/javascript">
         function submitFormData(){
-            var shippingInfo = {
-				'username':form.username.value,
+            var customerInfo = {
+				'user':form.user.value,
+				'name':form.name.value,
 				'email':form.email.value,
 				'password':form.password.value,
-				'repassword':form.repassword.value,
 			}
 
         var url = "/signup/"

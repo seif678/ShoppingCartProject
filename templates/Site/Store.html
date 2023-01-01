@@ -1,6 +1,29 @@
 {% extends 'Site/Main.html' %}
 {% load static %}
 {% block content %}
+    <form class="form-row my-2 my-lg-0">
+ <div class="list-group list-group-flush">
+					<li class="list-group-item">
+						<input type="range" value="{{minMaxPrice.price__max}}" max={{minMaxPrice.price__max}} min={{minMaxPrice.price__min}} id="rangeInput" oninput="maxPrice.value=this.value" />
+						<p>{{minMaxPrice.price__min}}-{{minMaxPrice.price__max}}</p>
+					</li>
+					<li class="list-group-item">
+						Max: <input type="search" name="k" value="{{minMaxPrice.price__max}}" max={{minMaxPrice.pricemax}} min={{minMaxPrice.price__min}} class="form-control" id="maxPrice" onkeyup="rangeInput.value=this.value" id="maxPrice" />
+						<button id="priceFilterBtn" class="btn btn-info btn-sm mt-1">Filter</button>
+					</li>
+				</div>
+    <div class="form-group col-md-4">
+            <label for="category">Category</label>
+            <select id="category" class="form-control" name="b">
+              <option selected name="bb">Choose...</option>
+              {% for product in categories %}
+              <option value="{{ product.brand }}">{{ product.brand }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+
+    <hr>
 	<div class="row">
 		{% for product in products %}
 		<div class="col-lg-4">
