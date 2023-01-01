@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db.models import Min, Max
 from django.db.models.signals import post_save
 from django.shortcuts import render, redirect
@@ -67,7 +68,7 @@ def Cart(request):
     context = {'items': items, 'order': order, 'cartItems': cartItems}
     return render(request, 'Site/Cart.html', context)
 
-
+@login_required(login_url='login')
 def Checkout(request):
     if request.user.is_authenticated:
         create_profile(sender=User, instance=request.user, created=True)
