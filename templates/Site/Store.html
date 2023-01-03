@@ -1,17 +1,19 @@
 {% extends 'Site/Main.html' %}
 {% load static %}
 {% block content %}
+
     <form class="form-row my-2 my-lg-0">
- <div class="list-group list-group-flush">
-					<li class="list-group-item">
-						<input type="range" value="{{minMaxPrice.price__max}}" max={{minMaxPrice.price__max}} min={{minMaxPrice.price__min}} id="rangeInput" oninput="maxPrice.value=this.value" />
-						<p>{{minMaxPrice.price__min}}-{{minMaxPrice.price__max}}</p>
-					</li>
-					<li class="list-group-item">
-						Max: <input type="search" name="k" value="{{minMaxPrice.price__max}}" max={{minMaxPrice.pricemax}} min={{minMaxPrice.price__min}} class="form-control" id="maxPrice" onkeyup="rangeInput.value=this.value" id="maxPrice" />
-						<button id="priceFilterBtn" class="btn btn-info btn-sm mt-1">Filter</button>
-					</li>
-				</div>
+
+<div class="slider">
+  <p>Price Range</p>
+
+  <div class="range-slider">
+    <span class="rangeValues"></span>
+      <input type="range" name="k" value="{{minMaxPrice.price__max}}" max={{minMaxPrice.price__max}} min={{minMaxPrice.price__min}}/>
+      <input type="range"name="h" value="{{minMaxPrice.price__min}}" max={{minMaxPrice.price__max}} min={{minMaxPrice.price__min}}/>
+
+  </div>
+</div>
     <div class="form-group col-md-4">
             <label for="category">Category</label>
             <select id="category" class="form-control" name="b">
@@ -20,8 +22,41 @@
               <option value="{{ product.brand }}">{{ product.brand }}</option>
               {% endfor %}
             </select>
+    						<button id="priceFilterBtn" class="btn btn-info btn-sm mt-1">Filter</button>
+
           </div>
         </form>
+    <script>function getVals(){
+  // Get slider values
+  let parent = this.parentNode;
+  let slides = parent.getElementsByTagName("input");
+    let slide1 = parseFloat( slides[0].value );
+    let slide2 = parseFloat( slides[1].value );
+  // Neither slider will clip the other, so make sure we determine which is larger
+  if( slide1 > slide2 ){ let tmp = slide2; slide2 = slide1; slide1 = tmp; }
+
+  let displayElement = parent.getElementsByClassName("rangeValues")[0];
+//innerHTML property allows Javascript code to manipulate a website being displayed
+      displayElement.innerHTML = "$" + slide1 + " - $" + slide2;
+}
+
+window.onload = function(){
+  // Initialize Sliders
+  let sliderSections = document.getElementsByClassName("range-slider");
+      for( let x = 0; x < sliderSections.length; x++ ){
+        let sliders = sliderSections[x].getElementsByTagName("input");
+        for( let y = 0; y < sliders.length; y++ ){
+          if( sliders[y].type ==="range" ){
+     //oninput attribute fires when the value of an <input> element is changed
+            sliders[y].oninput = getVals;
+            // Manually trigger event first time to display values
+            sliders[y].oninput();
+          }
+        }
+      }
+}</script>
+
+
 
     <hr>
 	<div class="row">

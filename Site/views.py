@@ -40,11 +40,16 @@ def Store(request):
         k = request.GET['k']
     else:
         k = maxPrice
+    if 'h' in request.GET:
+        h = request.GET['h']
+    else:
+        h = minPrice
+
     if 'b' in request.GET and request.GET['b'] != 'Choose...':
         b = request.GET['b']
-        products = Product.objects.filter(brand__icontains=b) & Product.objects.filter(price__range=(minPrice, k))
+        products = Product.objects.filter(brand__icontains=b) & Product.objects.filter(price__range=(h, k))
     else:
-        products = Product.objects.filter(price__range=(minPrice, k))
+        products = Product.objects.filter(price__range=(h, k))
 
     context = {'products': products, 'cartItems': cartItems, 'minMaxPrice': minMaxPrice, 'categories': categories}
     return render(request, 'Site/Store.html',context)
