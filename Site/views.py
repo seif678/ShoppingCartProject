@@ -81,11 +81,20 @@ def Checkout(request):
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
         items = order.orderitem_set.all()
         cartItems = order.get_cart_items
+        newtotal = order.get_cart_total*0.9
     else:
         items = []
         order = {'get_cart_total': 0, 'get_cart_items': 0, 'shipping': False}
         cartItems = order['get_cart_items']
-    context = {'items': items, 'order': order, 'cartItems': cartItems}
+        newtotal = order.get_cart_total*0.9
+    promocodes = ["PromoCode","promo","promocode"]
+    str=''
+    if 'n' in request.GET:
+        n = request.GET['n']
+        if n in promocodes:
+            str = "After Discount: ${}".format(newtotal)
+
+    context = {'items': items, 'order': order, 'cartItems': cartItems,'newtotal':newtotal,'str':str}
     return render(request, 'Site/Checkout.html', context)
 
 

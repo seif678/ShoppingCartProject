@@ -50,6 +50,11 @@
 				<a  class="btn btn-outline-dark" href="{% url 'Cart' %}">&#x2190; Back to Cart</a>
 				<hr>
 				<h3>Order Summary</h3>
+            <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" name = "n"  placeholder="Promo Code">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Apply</button>
+    </form>
+	</nav>
 				<hr>
 				{% for item in items %}
 				<div class="cart-row">
@@ -60,7 +65,8 @@
 				</div>
 				{% endfor %}
 				<h5>Items:   {{order.get_cart_items}}</h5>
-				<h5>Total:   ${{order.get_cart_total|floatformat:2}}</h5>
+                <h5>Total:   ${{order.get_cart_total|floatformat:2}} <br> {{ str }}</h5>
+
 			</div>
 		</div>
 	</div>
