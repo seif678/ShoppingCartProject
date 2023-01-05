@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-6o8b0+u41)4*w2ie_7&3!d7ty3=8jo5)-!x^g_e@%iz6(647uy
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'shoppingcartproject-production-3ef3.up.railway.app' ]
+ALLOWED_HOSTS = ['127.0.0.1','localhost', 'shoppingcartproject-production-3ef3.up.railway.app' ]
 
 
 # Application definition
